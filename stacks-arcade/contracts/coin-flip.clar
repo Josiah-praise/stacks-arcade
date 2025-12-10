@@ -112,7 +112,9 @@
 (define-public (flip (game-id uint))
   (match (map-get? games {id: game-id})
     game
-    (ok true)
+    (begin
+      (asserts! (is-open? (get status game)) err-not-open)
+      (ok true))
     err-not-found))
 
 ;; read only functions
