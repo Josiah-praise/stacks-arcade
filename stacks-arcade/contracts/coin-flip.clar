@@ -104,6 +104,7 @@
     game
     (begin
       (asserts! (is-eq tx-sender (get player game)) err-not-player)
+      (asserts! (is-open? (get status game)) err-not-open)
       (ok true))
     err-not-found))
 
