@@ -148,6 +148,11 @@ describe("coin-flip", () => {
     expect(postClaim.result).toBeUint(0n);
   });
 
+  it("rejects zero claims", () => {
+    const { result } = claim();
+    expect(result).toBeErr();
+  });
+
   // it("shows an example", () => {
   //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
   //   expect(result).toBeUint(0);
