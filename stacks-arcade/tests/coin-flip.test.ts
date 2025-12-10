@@ -35,6 +35,16 @@ describe("coin-flip", () => {
     expect(result).toBeErr();
   });
 
+  it("rejects wagers above maximum", () => {
+    const { result } = simnet.callPublicFn(
+      "coin-flip",
+      "create-game",
+      [simnet.uint(100_000_001n), simnet.uint(0)],
+      address1
+    );
+    expect(result).toBeErr();
+  });
+
   // it("shows an example", () => {
   //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
   //   expect(result).toBeUint(0);
