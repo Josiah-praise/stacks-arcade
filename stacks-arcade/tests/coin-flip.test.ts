@@ -13,6 +13,8 @@ const getGame = (id: bigint) =>
 const flip = (id: bigint, sender = address1) =>
   simnet.callPublicFn("coin-flip", "flip", [simnet.uint(id)], sender);
 const nextFlipParity = () => (BigInt(simnet.blockHeight) + 1n) % 2n;
+const getBalance = (who = address1) =>
+  simnet.callReadOnlyFn("coin-flip", "get-balance", [simnet.principal(who)], who);
 
 /*
   The test below is an example. To learn more, read the testing documentation here:
