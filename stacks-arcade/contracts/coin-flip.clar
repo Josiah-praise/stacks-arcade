@@ -66,19 +66,22 @@
       (asserts! (>= wager min-bet) err-insufficient-bet)
       (asserts! (<= wager max-bet) err-too-high-bet)
       (asserts! (or (is-eq pick u0) (is-eq pick u1)) err-invalid-pick)
-      (map-set games
-        {id: game-id}
-        {
-          player: tx-sender,
-          wager: wager,
-          pick: pick,
-          funded: false,
-          status: status-open,
-          result: none,
-          winner: false
-        })
-      (var-set next-game-id (+ game-id u1))
-      (ok game-id))))
+      (let
+        (
+          (game {
+            player: tx-sender,
+            wager: wager,
+            pick: pick,
+            funded: false,
+            status: status-open,
+            result: none,
+            winner: false
+          })
+        )
+        (begin
+          (map-set games {id: game-id} game)
+          (var-set next-game-id (+ game-id u1))
+          (ok game-id))))))
 
 ;; read only functions
 ;;
