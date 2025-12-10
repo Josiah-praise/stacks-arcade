@@ -11,6 +11,7 @@
 
 ;; constants
 ;;
+;; Note: randomness uses block-height parity, which is predictable and not suitable for production wagers.
 (define-constant contract-version "0.0.1")
 (define-constant contract-admin none) ;; reserved for future controls
 (define-constant min-bet u1000000) ;; 0.01 STX assuming microstacks
