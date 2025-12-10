@@ -102,7 +102,9 @@
 (define-public (cancel-game (game-id uint))
   (match (map-get? games {id: game-id})
     game
-    (ok true)
+    (begin
+      (asserts! (is-eq tx-sender (get player game)) err-not-player)
+      (ok true))
     err-not-found))
 
 ;; read only functions
