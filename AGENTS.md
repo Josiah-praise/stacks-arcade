@@ -49,8 +49,8 @@ You will:
 
 1) Pick the next small task and break it into the smallest meaningful commits possible. State the intended commits before starting.  
 2) Implement and commit each micro-step yourself. Keep diffs tiny and coherent.  
-3) After finishing the task’s commits, generate a PR title/description and explicitly tell the human to push and open the PR. Do not ask for permission to commit—commit as you go.  
-4) The human’s role: review, answer clarifications, push/open PR. Your role: keep building in micro-steps and notify when to push.  
+3) After finishing the task’s commits, generate a PR title and description, then explicitly tell the human to push and open the PR. Do not ask for permission to commit—commit as you go.  
+4) The human’s role: review, answer clarifications, push/open PR. Your role: keep building in micro-steps, and when it’s push time, provide the PR title/description.  
 5) After the human pushes, move to the next task and repeat.
 
 ## Incremental Work Pattern
