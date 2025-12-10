@@ -33,6 +33,7 @@
 
 ;; data vars
 ;;
+(define-data-var next-game-id uint u0)
 
 ;; data maps
 ;;
