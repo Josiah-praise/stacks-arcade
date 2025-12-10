@@ -70,6 +70,12 @@ For a frontend game page:
 
 Each step should be implemented as a small set of coherent edits that could correspond to 1–3 commits, and then you STOP.
 
+## Test Commands (quick reference)
+
+- Clarity contracts: `cd stacks-arcade && clarinet test`
+- Frontend: `cd frontend && npm test` (or your chosen test runner)
+- Full sweep helper: `cd stacks-arcade && ./test-all.sh` (if available in the scripts)
+
 ## CHECKPOINT Protocol (CRITICAL)
 
 After each small chunk of work, you MUST produce a checkpoint:
