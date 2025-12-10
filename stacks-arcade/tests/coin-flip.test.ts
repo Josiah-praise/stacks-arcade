@@ -8,6 +8,8 @@ const create = (wager: bigint, pick: bigint, sender = address1) =>
   simnet.callPublicFn("coin-flip", "create-game", [simnet.uint(wager), simnet.uint(pick)], sender);
 const fund = (id: bigint, sender = address1) =>
   simnet.callPublicFn("coin-flip", "fund-game", [simnet.uint(id)], sender);
+const getGame = (id: bigint) =>
+  simnet.callReadOnlyFn("coin-flip", "get-game", [simnet.uint(id)], address1);
 
 /*
   The test below is an example. To learn more, read the testing documentation here:
