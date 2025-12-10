@@ -82,6 +82,11 @@
           (map-set games {id: game-id} game)
           (var-set next-game-id (+ game-id u1))
           (ok game-id))))))
+(define-public (fund-game (game-id uint))
+  (match (map-get? games {id: game-id})
+    game
+    (ok true)
+    err-not-found))
 
 ;; read only functions
 ;;
