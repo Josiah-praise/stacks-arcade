@@ -9,7 +9,7 @@ const address1 = accounts.get("wallet_1")!;
   https://docs.hiro.so/stacks/clarinet-js-sdk
 */
 
-describe("example tests", () => {
+describe("coin-flip", () => {
   it("ensures simnet is well initialised", () => {
     expect(simnet.blockHeight).toBeDefined();
   });
