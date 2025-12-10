@@ -16,6 +16,17 @@
 (define-constant min-bet u1000000) ;; 0.01 STX assuming microstacks
 (define-constant max-bet u100000000) ;; 1 STX cap
 (define-constant fee-bps u0) ;; no fee yet
+(define-constant err-not-open (err u100))
+(define-constant err-insufficient-bet (err u101))
+(define-constant err-too-high-bet (err u102))
+(define-constant err-invalid-pick (err u103))
+(define-constant err-not-player (err u104))
+(define-constant err-already-funded (err u105))
+(define-constant err-not-funded (err u106))
+(define-constant err-already-settled (err u107))
+(define-constant err-transfer-failed (err u108))
+(define-constant err-zero-claim (err u109))
+(define-constant err-not-found (err u110))
 
 ;; data vars
 ;;
