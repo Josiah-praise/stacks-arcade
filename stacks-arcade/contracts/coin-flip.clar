@@ -38,6 +38,18 @@
 ;; data maps
 ;;
 ;; game tuple shape: {player: principal, wager: uint, pick: uint, funded: bool, status: uint, result: (optional uint), winner: bool}
+(define-map games
+  ((id uint))
+  (
+    (player principal)
+    (wager uint)
+    (pick uint)
+    (funded bool)
+    (status uint)
+    (result (optional uint))
+    (winner bool)
+  )
+)
 
 ;; public functions
 ;;
