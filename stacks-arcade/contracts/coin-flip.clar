@@ -97,6 +97,7 @@
         )
         (begin
           (unwrap! (stx-transfer? wager tx-sender contract-principal) err-transfer-failed)
+          (print {event: "fund", id: game-id, player: tx-sender, wager: wager})
           (map-set games {id: game-id} (merge game {funded: true}))
           (ok true))))
     err-not-found))
