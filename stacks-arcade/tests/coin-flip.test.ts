@@ -15,6 +15,16 @@ describe("coin-flip", () => {
     expect(simnet.blockHeight).toBeDefined();
   });
 
+  it("creates a game with valid wager and pick", () => {
+    const { result } = simnet.callPublicFn(
+      "coin-flip",
+      "create-game",
+      [simnet.uint(1_000_000n), simnet.uint(0)],
+      address1
+    );
+    expect(result).toBeOk(simnet.uint(0n));
+  });
+
   // it("shows an example", () => {
   //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
   //   expect(result).toBeUint(0);
