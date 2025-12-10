@@ -66,6 +66,10 @@
   (map-get? games {id: game-id}))
 (define-read-only (get-balance (who principal))
   (default-to u0 (get amount (map-get? balances {player: who}))))
+(define-read-only (is-funded (game-id uint))
+  (match (map-get? games {id: game-id})
+    game (get funded game)
+    false))
 
 ;; private functions
 ;;
