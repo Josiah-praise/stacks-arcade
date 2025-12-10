@@ -134,6 +134,20 @@ describe("coin-flip", () => {
     expect(flip(0n).result).toBeErr();
   });
 
+  it("claims owed balance after win", () => {
+    const startHeight = BigInt(simnet.blockHeight);
+    const winningPick = (startHeight + 3n) % 2n;
+    create(1_000_000n, winningPick);
+    fund(0n);
+    flip(0n);
+    const preClaim = getBalance();
+    expect(preClaim.result).toBeUint(2_000_000n);
+    const { result } = claim();
+    expect(result).toBeOk();
+    const postClaim = getBalance();
+    expect(postClaim.result).toBeUint(0n);
+  });
+
   // it("shows an example", () => {
   //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
   //   expect(result).toBeUint(0);
