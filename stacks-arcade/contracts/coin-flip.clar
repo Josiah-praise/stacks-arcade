@@ -38,22 +38,23 @@
 
 ;; data maps
 ;;
-;; game tuple shape: {player: principal, wager: uint, pick: uint, funded: bool, status: uint, result: (optional uint), winner: bool}
+;; game tuple shape: {id: uint, player: principal, wager: uint, pick: uint, funded: bool, status: uint, result: (optional uint), winner: bool}
 (define-map games
-  ((id uint))
-  (
-    (player principal)
-    (wager uint)
-    (pick uint)
-    (funded bool)
-    (status uint)
-    (result (optional uint))
-    (winner bool)
-  )
+  {id: uint}
+  {
+    id: uint,
+    player: principal,
+    wager: uint,
+    pick: uint,
+    funded: bool,
+    status: uint,
+    result: (optional uint),
+    winner: bool
+  }
 )
 (define-map balances
-  ((player principal))
-  ((amount uint))
+  {player: principal}
+  {amount: uint}
 )
 
 ;; public functions
@@ -70,6 +71,7 @@
       (let
         (
           (game {
+            id: game-id,
             player: tx-sender,
             wager: wager,
             pick: pick,
@@ -89,28 +91,28 @@
     game
     (begin
       (asserts! (is-open? (get status game)) err-not-open)
-      (assert-player (get player game))
+      (unwrap! (assert-player (get player game)) err-not-player)
       (asserts! (not (get funded game)) err-already-funded)
       (let
         (
-          (contract-principal (as-contract tx-sender tx-sender))
+          (contract-principal (unwrap! (as-contract? () tx-sender) err-transfer-failed))
           (wager (get wager game))
         )
         (begin
           (unwrap! (stx-transfer? wager tx-sender contract-principal) err-transfer-failed)
           (print {event: "fund", id: game-id, player: tx-sender, wager: wager})
-          (map-set games {id: game-id} (merge game {funded: true}))
+          (map-set games {id: (get id game)} (merge game {funded: true}))
           (ok true))))
     err-not-found))
 (define-public (cancel-game (game-id uint))
   (match (map-get? games {id: game-id})
     game
     (begin
-      (assert-player (get player game))
+      (unwrap! (assert-player (get player game)) err-not-player)
       (asserts! (is-open? (get status game)) err-not-open)
       (asserts! (not (get funded game)) err-already-funded)
       (print {event: "cancel", id: game-id, player: tx-sender})
-      (map-set games {id: game-id} (merge game {status: status-canceled}))
+      (map-set games {id: (get id game)} (merge game {status: status-canceled}))
       (ok true))
     err-not-found))
 (define-public (flip (game-id uint))
@@ -119,10 +121,10 @@
     (begin
       (asserts! (is-open? (get status game)) err-not-open)
       (asserts! (get funded game) err-not-funded)
-      (assert-player (get player game))
+      (unwrap! (assert-player (get player game)) err-not-player)
       (let
         (
-          (result (mod (block-height) u2))
+          (result (mod stacks-block-height u2))
           (winner (is-eq result (get pick game)))
           (player (get player game))
           (wager (get wager game))
@@ -132,7 +134,7 @@
             (payout (if winner (* wager u2) u0))
             (updated (merge game {status: status-settled, result: (some result), winner: winner}))
           )
-          (map-set games {id: game-id} updated)
+          (map-set games {id: (get id game)} updated)
           (print {event: "flip", id: game-id, player: tx-sender, result: result, winner: winner, payout: payout})
           (if (> payout u0)
             (let
@@ -140,7 +142,7 @@
                 (current (default-to u0 (get amount (map-get? balances {player: player}))))
               )
               (map-set balances {player: player} {amount: (+ current payout)}))
-            (ok true))
+            true)
           (ok {result: result, winner: winner}))))
     err-not-found))
 (define-public (claim)
@@ -150,7 +152,7 @@
     )
     (asserts! (> amount u0) err-zero-claim)
     (let ((recipient tx-sender))
-      (unwrap! (as-contract tx-sender (stx-transfer? amount tx-sender recipient)) err-transfer-failed)
+      (unwrap! (as-contract? ((with-stx amount)) (try! (stx-transfer? amount tx-sender recipient))) err-transfer-failed)
       (print {event: "claim", player: recipient, amount: amount}))
     (map-set balances {player: tx-sender} {amount: u0})
     (ok true)))
@@ -170,7 +172,7 @@
     false))
 (define-read-only (get-result (game-id uint))
   (match (map-get? games {id: game-id})
-    game {result: (get result game), winner: (get winner game)}
+    game (some {result: (get result game), winner: (get winner game)})
     none))
 
 ;; private functions
@@ -180,4 +182,6 @@
 (define-private (is-settled? (status uint))
   (is-eq status status-settled))
 (define-private (assert-player (player principal))
-  (asserts! (is-eq tx-sender player) err-not-player))
+  (if (is-eq tx-sender player)
+      (ok true)
+      err-not-player))

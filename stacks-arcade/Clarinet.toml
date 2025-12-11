@@ -2,60 +2,62 @@
 name = 'stacks-arcade'
 description = ''
 authors = []
-telemetry = true
+telemetry = false
 cache_dir = './.cache'
 requirements = []
 [contracts.coin-flip]
 path = 'contracts/coin-flip.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.emoji-battle]
 path = 'contracts/emoji-battle.clar'
-clarity_version = 3
-epoch = '3.2'
-
-[contracts.higher-lower]
-path = 'contracts/higher-lower.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.guess-the-number]
 path = 'contracts/guess-the-number.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
+
+[contracts.higher-lower]
+path = 'contracts/higher-lower.clar'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.hot-potato]
 path = 'contracts/hot-potato.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.lottery-demo]
 path = 'contracts/lottery-demo.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.rock-paper-scissors]
 path = 'contracts/rock-paper-scissors.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.scoreboard]
 path = 'contracts/scoreboard.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.tic-tac-toe]
 path = 'contracts/tic-tac-toe.clar'
-clarity_version = 3
-epoch = '3.2'
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.todo-list]
 path = 'contracts/todo-list.clar'
-clarity_version = 3
+clarity_version = 4
 epoch = 'latest'
 [repl.analysis]
 passes = ['check_checker']
+
+[repl.analysis.lints]
 
 [repl.analysis.check_checker]
 strict = false
