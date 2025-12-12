@@ -1,29 +1,92 @@
 ;; title: emoji-battle
-;; version:
-;; summary:
-;; description:
-
-;; traits
-;;
-
-;; token definitions
-;;
+;; version: 0.0.1
+;; summary: Two-player emoji duel with staked bets and simple element matchups.
+;; description: Creator stakes an emoji and wager; a challenger joins with their emoji. Winner takes both stakes or both are refunded on a tie.
 
 ;; constants
-;;
+(define-constant contract-version "0.0.1")
+(define-constant status-open u0)
+(define-constant status-settled u1)
+(define-constant status-canceled u2)
+(define-constant min-stake u0)
+(define-constant max-stake u100000000) ;; 1 STX cap for demo
+(define-constant emoji-fire "fire")
+(define-constant emoji-water "water")
+(define-constant emoji-leaf "leaf")
+(define-constant err-invalid-emoji (err u400))
+(define-constant err-stake-low (err u401))
+(define-constant err-stake-high (err u402))
+(define-constant err-not-open (err u403))
+(define-constant err-already-joined (err u404))
+(define-constant err-self-join (err u405))
+(define-constant err-transfer (err u406))
+(define-constant err-not-creator (err u407))
+(define-constant err-zero-claim (err u408))
+(define-constant err-not-found (err u409))
 
 ;; data vars
-;;
+(define-data-var next-game-id uint u0)
 
 ;; data maps
-;;
+;; game tuple: {id, creator, challenger, stake, emoji1, emoji2, status, winner, result, created-at}
+(define-map games
+  {id: uint}
+  {
+    id: uint,
+    creator: principal,
+    challenger: (optional principal),
+    stake: uint,
+    emoji1: (string-ascii 10),
+    emoji2: (optional (string-ascii 10)),
+    status: uint,
+    winner: (optional principal),
+    result: (string-ascii 10),
+    created_at: uint
+  }
+)
+(define-map balances {player: principal} {amount: uint})
 
-;; public functions
-;;
+;; private helpers
+(define-private (is-open? (status uint))
+  (is-eq status status-open))
 
-;; read only functions
-;;
+(define-private (allowed-emoji? (emoji (string-ascii 10)))
+  (or (is-eq emoji emoji-fire)
+      (is-eq emoji emoji-water)
+      (is-eq emoji emoji-leaf)))
 
-;; private functions
-;;
+(define-private (beats? (attacker (string-ascii 10)) (defender (string-ascii 10)))
+  (or (and (is-eq attacker emoji-fire) (is-eq defender emoji-leaf))
+      (and (is-eq attacker emoji-leaf) (is-eq defender emoji-water))
+      (and (is-eq attacker emoji-water) (is-eq defender emoji-fire))))
 
+(define-private (resolve-battle (emoji1 (string-ascii 10)) (emoji2 (string-ascii 10)) (creator principal) (challenger principal))
+  (let
+    (
+      (winner
+        (if (is-eq emoji1 emoji2)
+          none
+          (if (beats? emoji1 emoji2) (some creator) (some challenger))))
+      (result (if (is-eq emoji1 emoji2) "tie" (if (beats? emoji1 emoji2) "creator" "challenger")))
+    )
+    {winner: winner, result: result}))
+
+(define-private (credit (player principal) (amount uint))
+  (let
+    (
+      (current (default-to u0 (get amount (map-get? balances {player: player}))))
+    )
+    (map-set balances {player: player} {amount: (+ current amount)})))
+
+(define-private (assert-creator (expected principal))
+  (if (is-eq tx-sender expected)
+      (ok true)
+      err-not-creator))
+
+(define-private (contract-principal)
+  (unwrap-panic (as-contract? () tx-sender)))
+
+(define-private (winner->ascii (winner (optional principal)))
+  (match winner
+    some-w (unwrap-panic (to-ascii? some-w))
+    (unwrap-panic (to-ascii? u"none"))))
