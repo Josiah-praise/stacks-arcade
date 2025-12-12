@@ -90,3 +90,34 @@
   (match winner
     some-w (unwrap-panic (to-ascii? some-w))
     (unwrap-panic (to-ascii? u"none"))))
+
+;; public functions
+(define-public (create-game (stake uint) (emoji (string-ascii 10)))
+  (let
+    (
+      (game-id (var-get next-game-id))
+      (created_at stacks-block-time)
+      (self (contract-principal))
+    )
+    (begin
+      (asserts! (allowed-emoji? emoji) err-invalid-emoji)
+      (asserts! (>= stake min-stake) err-stake-low)
+      (asserts! (<= stake max-stake) err-stake-high)
+      (unwrap! (stx-transfer? stake tx-sender self) err-transfer)
+      (map-set games {id: game-id}
+        {
+          id: game-id,
+          creator: tx-sender,
+          challenger: none,
+          stake: stake,
+          emoji1: emoji,
+          emoji2: none,
+          status: status-open,
+          winner: none,
+          result: "open",
+          created_at: created_at
+        })
+      (var-set next-game-id (+ game-id u1))
+      (print {event: "create", id: game-id, creator: tx-sender, stake: stake, emoji: emoji, at: created_at})
+      (ok game-id))))
+
