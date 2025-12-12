@@ -162,11 +162,13 @@ result: Cl.some(Cl.uint(storedResult)),
 winner: Cl.bool(winner),
 }),
 );
+// Check the player's owed balance (should be 2x wager if won, 0 if lost)
 const owed = simnet.callReadOnlyFn(
 contractName,
 "get-balance",
 [Cl.standardPrincipal(wallet1)],
 wallet1,);
+// Expected payout is double the wager if winner, otherwise 0
 const expectedPayout = winner ? wager * 2n : 0n;
 expect(owed.result).toBeUint(expectedPayout);
 });
