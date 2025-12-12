@@ -196,6 +196,7 @@ status: Cl.uint(settledStatus),
 result: Cl.some(Cl.uint(resultValue)),
 winner: Cl.bool(true),
 }),);
+// Verify the player has a balance owed (2x wager for win)
 const owed = simnet.callReadOnlyFn(
 contractName,
 "get-balance",
@@ -203,8 +204,10 @@ contractName,
 wallet1,
 );
 expect(owed.result).toBeUint(wager * 2n);
+// Claim the payout - should transfer STX to the player
 const claim = simnet.callPublicFn(contractName, "claim", [], wallet1);
 expect(claim.result).toBeOk(Cl.bool(true));
+// Verify the balance is now cleared after claiming
 const cleared = simnet.callReadOnlyFn(
 contractName,
 "get-balance",
