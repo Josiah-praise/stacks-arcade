@@ -85,13 +85,16 @@ attempt += 1;
 throw new Error("Could not produce a winning flip within 6 attempts");
 };
 describe("coin-flip", () => {
+// Test that the contract rejects invalid pick values (must be 0 or 1)
 it("rejects invalid pick values", () => {
+// Try to create a game with pick value 2 (invalid, should be 0 or 1)
 const res = simnet.callPublicFn(
 contractName,
 "create-game",
 [Cl.uint(minBet), Cl.uint(2)],
 wallet1,
 );
+// Expect error code 103 (err-invalid-pick)
 expect(res.result).toBeErr(Cl.uint(103));});
 it("requires the player to fund their own game", () => {
 const create = simnet.callPublicFn(
