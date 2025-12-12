@@ -1,11 +1,11 @@
 # Coin Flip Contract
 
-Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows a wager, flips on-chain using block-height parity, and claims a payout if correct.
+Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows a wager, flips on-chain using a mix of block-height and block-time (mod 2), and claims a payout if correct.
 
 ## Core Flow
 - Create game: `create-game (wager uint) (pick uint)` → returns game id. Validates `min-bet <= wager <= max-bet` and `pick` is `u0` or `u1`.
 - Fund: `fund-game (game-id uint)` → player transfers the wager to contract and marks game funded.
-- Flip: `flip (game-id uint)` → only player; requires funded/open. Result is `block-height mod 2`; winner if equals pick. Pays `wager * 2` to player’s internal balance when they win.
+- Flip: `flip (game-id uint)` → only player; requires funded/open. Result is `(block-height + block-time) mod 2`; winner if equals pick. Pays `wager * 2` to player's internal balance when they win.
 - Claim: `claim` → withdraws accumulated owed balance to caller.
 - Cancel: `cancel-game (game-id uint)` → only before funding; marks canceled.
 
@@ -17,7 +17,7 @@ Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows 
 ## Events (print)
 - `create`: id, player, wager, pick
 - `fund`: id, player, wager
-- `flip`: id, player, result, winner, payout
+- `flip`: id, player, result, winner, winner-ascii, payout
 - `cancel`: id, player
 - `claim`: player, amount
 
@@ -27,7 +27,7 @@ Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows 
 - `err-zero-claim`, `err-transfer-failed`, `err-not-found`
 
 ## Notes & Limitations
-- Randomness uses predictable block-height parity; acceptable for demos but not for real wagering. For production, replace with verifiable randomness or multi-party commit-reveal.
+- Randomness uses a mix of block-height and block-time (mod 2), which is still predictable and not suitable for production wagering. For production, replace with verifiable randomness or multi-party commit-reveal.
 - Payouts accrue in `balances` and require `claim`. No fees are taken (`fee-bps = 0`).
 - Max bet (`max-bet`) caps exposure; min bet (`min-bet`) blocks dust.
 
