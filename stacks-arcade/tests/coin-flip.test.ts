@@ -130,17 +130,26 @@ winner: Cl.bool(false),
 }),
 );
 });
+// Test that flipping a game settles it and records payout correctly
 it("settles a flip and records payout based on winner", () => {
+// Fund the contract so it can pay out winnings
 fundContract(10_000_000n);
 const wager = 2_000_000n;
+// Create and fund a game with pick 0 (heads)
 const gameId = createAndFundGame(0, wager, wallet1);
+// Execute the flip
 const flip = simnet.callPublicFn(contractName, "flip", [Cl.uint(gameId)],
 wallet1);
-expect(flip.result).toHaveClarityType(ClarityType.ResponseOk);const gameEntry = getGameTuple(gameId);
+expect(flip.result).toHaveClarityType(ClarityType.ResponseOk);
+// Get the updated game state after flip
+const gameEntry = getGameTuple(gameId);
+// Extract the flip result (0 or 1) from the game entry
 const storedResult = (gameEntry.value.result as
 SomeCV<UIntCV>).value.value;
+// Check if the player won
 const winner = (gameEntry.value.winner as any).type ===
 ClarityType.BoolTrue;
+// Verify the game state is correct (status should be settled)
 expect(gameEntry).toEqual(
 Cl.tuple({
 id: Cl.uint(gameId),
