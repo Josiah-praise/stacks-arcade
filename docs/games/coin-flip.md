@@ -1,6 +1,6 @@
 # Coin Flip Contract
 
-Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows a wager, flips on-chain using block-height parity, and claims a payout if correct.
+Single-player coin flip where a wallet chooses heads/tails (`u0`/`u1`), escrows a wager, flips on-chain using a mix of block-height and block-time (mod 2), and claims a payout if correct.
 
 ## Core Flow
 - Create game: `create-game (wager uint) (pick uint)` → returns game id. Validates `min-bet <= wager <= max-bet` and `pick` is `u0` or `u1`.
