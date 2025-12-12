@@ -121,3 +121,33 @@
       (print {event: "create", id: game-id, creator: tx-sender, stake: stake, emoji: emoji, at: created_at})
       (ok game-id))))
 
+(define-public (join-game (game-id uint) (emoji (string-ascii 10)))
+  (let ((game (unwrap! (map-get? games {id: game-id}) err-not-found)))
+    (begin
+      (asserts! (allowed-emoji? emoji) err-invalid-emoji)
+      (asserts! (is-open? (get status game)) err-not-open)
+      (asserts! (is-none (get challenger game)) err-already-joined)
+      (asserts! (not (is-eq tx-sender (get creator game))) err-self-join)
+      (let ((self (contract-principal)))
+        (unwrap! (stx-transfer? (get stake game) tx-sender self) err-transfer))
+      (let
+        (
+          (resolution (resolve-battle (get emoji1 game) emoji (get creator game) tx-sender))
+          (updated (merge game {challenger: (some tx-sender), emoji2: (some emoji), status: status-settled}))
+        )
+        (let
+          (
+            (winner (get winner resolution))
+            (result (get result resolution))
+            (stake (get stake game))
+          )
+          (begin
+            (if (is-none winner)
+              (begin
+                (credit (get creator game) stake)
+                (credit tx-sender stake))
+              (credit (default-to tx-sender winner) (* stake u2)))
+            (map-set games {id: game-id} (merge updated {winner: winner, result: result}))
+            (print {event: "settle", id: game-id, creator: (get creator game), challenger: tx-sender, result: result, winner: winner, winner-ascii: (winner->ascii winner), payout: (if (is-none winner) stake (* stake u2))})
+            (ok {result: result, winner: winner})))))))
+
