@@ -17,14 +17,21 @@ const contractName = "coin-flip";
 // Constants matching the contract configuration
 const minBet = 1_000_000n; // Minimum bet amount (1 STX in microstacks)
 const settledStatus = 1n; // Game status value for settled games
+// Helper function to extract game ID from contract response
 const extractGameId = (response: { value: UIntCV }) =>
 Number(response.value.value);
+
+// Helper function to fund the contract with STX for testing payouts
 const fundContract = (amount: bigint) => {
 simnet.mintSTX(simnet.deployer, amount);
 simnet.transferSTX(amount, contractPrincipal, simnet.deployer);
 };
+
+// Helper function to create a game and fund it in one step
+// Returns the game ID for use in subsequent operations
 const createAndFundGame = (pick: number, wager: bigint, player: string) =>
 {
+// Create the game with specified pick (0 = heads, 1 = tails) and wager
 const create = simnet.callPublicFn(
 contractName,
 "create-game",
@@ -32,11 +39,16 @@ contractName,
 player,
 );
 expect(create.result).toHaveClarityType(ClarityType.ResponseOk);const gameId = extractGameId(create.result as any);
+
+// Fund the created game by transferring the wager to the contract
 const fund = simnet.callPublicFn(contractName, "fund-game",
 [Cl.uint(gameId)], player);
 expect(fund.result).toBeOk(Cl.bool(true));
 return gameId;
 };
+
+// Helper function to retrieve a game tuple from the contract's games map
+// Throws an error if the game doesn't exist
 const getGameTuple = (gameId: number) => {
 const entry = simnet.getMapEntry(contractName, "games", Cl.tuple({ id:
 Cl.uint(gameId) }));
