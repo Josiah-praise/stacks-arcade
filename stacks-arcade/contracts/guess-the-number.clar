@@ -38,3 +38,87 @@
 ;; private helpers
 (define-private (contract-principal)
   (unwrap-panic (as-contract? () tx-sender)))
+
+(define-private (credit (player principal) (amount uint))
+  (let ((current (default-to u0 (get amount (map-get? balances {player: player})))))
+    (map-set balances {player: player} {amount: (+ current amount)})))
+
+(define-private (draw-number)
+  (mod (+ stacks-block-height stacks-block-time) (+ max-number u1)))
+
+;; public functions
+(define-public (play (wager uint) (guess uint))
+  (let
+    (
+      (game-id (var-get next-game-id))
+      (self (contract-principal))
+      (at stacks-block-time)
+    )
+    (begin
+      (asserts! (<= guess max-number) err-invalid-guess)
+      (asserts! (>= wager min-bet) err-bet-low)
+      (asserts! (<= wager max-bet) err-bet-high)
+      (unwrap! (stx-transfer? wager tx-sender self) err-transfer)
+      (let
+        (
+          (draw (draw-number))
+          (winner (is-eq guess (draw-number)))
+          (payout (if winner (* wager u2) u0))
+        )
+        (begin
+          (map-set games {id: game-id}
+            {
+              id: game-id,
+              player: tx-sender,
+              wager: wager,
+              guess: guess,
+              draw: draw,
+              winner: winner,
+              at: at
+            })
+          (var-set next-game-id (+ game-id u1))
+          (if winner (credit tx-sender (* wager u2)) true)
+          (print {event: "play", id: game-id, player: tx-sender, guess: guess, draw: draw, winner: winner, payout: payout})
+          (ok {draw: draw, winner: winner})))))))
+
+(define-private (credit (player principal) (amount uint))
+  (let ((current (default-to u0 (get amount (map-get? balances {player: player})))))
+    (map-set balances {player: player} {amount: (+ current amount)})))
+
+(define-private (draw-number)
+  (mod (+ stacks-block-height stacks-block-time) (+ max-number u1)))
+
+;; public functions
+(define-public (play (guess uint) (wager uint))
+  (let
+    (
+      (game-id (var-get next-game-id))
+      (draw (draw-number))
+      (self (contract-principal))
+      (played-at stacks-block-time)
+    )
+    (begin
+      (asserts! (<= guess max-number) err-invalid-guess)
+      (asserts! (>= wager min-bet) err-bet-low)
+      (asserts! (<= wager max-bet) err-bet-high)
+      (unwrap! (stx-transfer? wager tx-sender self) err-transfer)
+      (let
+        (
+          (winner (is-eq guess draw))
+          (payout (if (is-eq guess draw) (* wager u2) u0))
+        )
+        (when (> payout u0)
+          (credit tx-sender payout))
+        (map-set games {id: game-id}
+          {
+            id: game-id,
+            player: tx-sender,
+            wager: wager,
+            guess: guess,
+            draw: draw,
+            winner: winner,
+            at: played-at
+          })
+        (var-set next-game-id (+ game-id u1))
+        (print {event: "play", id: game-id, player: tx-sender, guess: guess, draw: draw, winner: winner, payout: payout})
+        (ok {draw: draw, winner: winner})))))
