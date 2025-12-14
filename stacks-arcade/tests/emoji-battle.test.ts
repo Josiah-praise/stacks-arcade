@@ -50,6 +50,21 @@ describe("emoji-battle", () => {
     expect(res.result).toBeErr(Cl.uint(400));
   });
 
+  it("prevents a creator from joining their own game", () => {
+    const gameId = createGame(wallet1, "water");
+    const res = simnet.callPublicFn(
+      contractName,
+      "join-game",
+      [Cl.uint(gameId), Cl.stringAscii("fire")],
+      wallet1,
+    );
+    expect(res.result).toBeErr(Cl.uint(405));
+
+    const game = getGameTuple(gameId);
+    expect(game.value.status).toEqual(Cl.uint(0));
+    expect(game.value.challenger).toBeNone();
+  });
+
   it("settles a battle with a clear winner", () => {
     // fire beats leaf
     const gameId = createGame(wallet1, "fire");
