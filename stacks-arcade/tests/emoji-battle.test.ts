@@ -102,6 +102,28 @@ describe("emoji-battle", () => {
     expect(challengerBalance.result).toBeUint(0);
   });
 
+  it("blocks additional challengers once a game is settled", () => {
+    const gameId = createGame(wallet1, "fire");
+    const firstJoin = simnet.callPublicFn(
+      contractName,
+      "join-game",
+      [Cl.uint(gameId), Cl.stringAscii("leaf")],
+      wallet2,
+    );
+    expect(firstJoin.result).toBeOk(Cl.tuple({ result: Cl.stringAscii("creator"), winner: Cl.some(Cl.standardPrincipal(wallet1)) }));
+
+    const secondJoin = simnet.callPublicFn(
+      contractName,
+      "join-game",
+      [Cl.uint(gameId), Cl.stringAscii("water")],
+      wallet1,
+    );
+    expect(secondJoin.result).toBeErr(Cl.uint(403));
+
+    const game = getGameTuple(gameId);
+    expect(game.value.status).toEqual(Cl.uint(1));
+  });
+
   it("refunds both players on a tie", () => {
     const gameId = createGame(wallet1, "water");
     const join = simnet.callPublicFn(
