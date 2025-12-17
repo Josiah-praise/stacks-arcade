@@ -110,5 +110,15 @@ describe("guess-the-number", () => {
     const nextId = nextGameId();
     expect(nextId).toBe(startId + 1);
   });
+
+  it("credits winners and allows claiming", () => {
+    playUntilWin(minBet);
+    const credited = getBalance(player);
+    expect(credited).toBe(BigInt(minBet * 2n));
+    const claim = simnet.callPublicFn(contractName, "claim", [], player);
+    expect(claim.result).toBeOk(Cl.bool(true));
+    const after = getBalance(player);
+    expect(after).toBe(0n);
+  });
   
 });
