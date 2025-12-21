@@ -26,3 +26,4 @@ Planned shared leaderboard to track per-player scores across games. Contract is 
 - Fill `contracts/scoreboard.clar` with data structures and permission checks.
 - Replace example Vitest with leaderboard tests: record, update, read-only pagination.
 - Decide how game contracts authenticate (e.g., deployer-only, allowlist of principals).
+- Ensure any leaderboard pagination fits within Clarity list size limits; consider returning slices rather than entire board.
