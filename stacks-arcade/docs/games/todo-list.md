@@ -29,3 +29,4 @@ Simple on-chain todo list for demo purposes. Contract is empty today; this doc c
 ## Notes
 - Keep strings reasonably small to avoid exceeding Clarity size limits; current suggestion: title 64, details 256.
 - Consider per-owner item cap to avoid unbounded storage.
+- Use stable ids per owner to keep UI caches simple; avoid reindexing on delete by leaving gaps.
