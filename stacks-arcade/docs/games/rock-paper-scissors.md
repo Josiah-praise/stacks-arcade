@@ -23,6 +23,7 @@ Two-player wagered RPS. Contract code is a stub today; this outline documents ex
 - Use commit-reveal to avoid front-running; store commitment as hash of move+salt.
 - Add timeout to allow challenger to reclaim funds if creator never reveals.
 - Keep move representation small (uint) to simplify comparisons.
+- Consider limiting max outstanding games per creator to prevent storage spam.
 
 ## Implementation TODOs
 - Implement contract in `contracts/rock-paper-scissors.clar` with commit-reveal flow.
