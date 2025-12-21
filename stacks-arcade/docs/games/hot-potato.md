@@ -23,6 +23,7 @@ Design sketch for a pass-the-potato game where players rotate custody of a stake
 - Decide deterministic end condition (block time/height) for predictability in simnet.
 - Should every pass require a micro-fee to prevent spamming?
 - How to prevent griefing by refusing to pass (e.g., auto-pass after deadline)?
+- Limit player count to avoid oversized tuples in clarity when storing pass history.
 
 ## Implementation TODOs
 - Fill in `contracts/hot-potato.clar` with constants, data structures, and pass/settle logic.
