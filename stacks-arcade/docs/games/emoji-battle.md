@@ -19,6 +19,12 @@ Two-player emoji duel where the creator stakes an emoji and wager, a challenger 
 - `balances` map accrues owed STX per player (payouts credited, then withdrawn via `claim`).
 - `next-game-id` data var counts games.
 
+## Read-Only
+- `get-next-game-id` → returns the next id before creation.
+- `get-game (game-id)` → optional game tuple; useful for indexers.
+- `get-balance (who)` → owed microstacks for an address.
+- `get-version` → contract version string.
+
 ## Events (print)
 - `create`: id, creator, stake, emoji, created timestamp
 - `settle`: id, creator, challenger, result, winner, winner-ascii, payout
