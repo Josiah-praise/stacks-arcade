@@ -22,11 +22,11 @@ async function deployContract() {
   
   const transaction = await makeContractDeploy(txOptions);
   console.log("Transaction: ", transaction)
-  // const broadcastResponse = await broadcastTransaction(transaction, network);
+  const broadcastResponse = await broadcastTransaction({transaction, });
   
-  // console.log('Contract deployed!');
-  // console.log('Transaction ID:', broadcastResponse.txid);
-  // console.log('Contract address:', `${senderAddress}.${txOptions.contractName}`);
+  console.log('Contract deployed!');
+  console.log('Transaction ID:', broadcastResponse.txid);
+  console.log('Contract address:', `${senderAddress}.${txOptions.contractName}`);
 }
 
 await deployContract();
